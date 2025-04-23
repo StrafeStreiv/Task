@@ -1,0 +1,43 @@
+﻿@model TaskManagementSys.Models.TaskItem
+@{
+    ViewData["Title"] = "Создание задачи";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <form asp-action="Create" class="mt-4">
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" placeholder="Введите название..." autofocus />
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Опишите суть задачи..."></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Priority" class="form-label"></label>
+            <select asp-for="Priority" class="form-select">
+                <option value="Низкий">Низкий</option>
+                <option value="Обычный">Обычный</option>
+                <option value="Высокий">Высокий</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DueDate" class="form-label"></label>
+            <input asp-for="DueDate" type="date" class="form-control" />
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">💾 Сохранить</button>
+            <a asp-action="Index" class="btn btn-secondary">↩ Назад</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

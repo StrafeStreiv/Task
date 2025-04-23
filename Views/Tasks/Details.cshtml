@@ -1,0 +1,20 @@
+﻿@model TaskManagementSys.Models.TaskItem
+@{
+    ViewData["Title"] = "Информация о задаче";
+}
+
+<div class="container mt-4">
+    <h2>Информация о задаче</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h4 class="card-title">@Model.Title</h4>
+            <h6 class="card-subtitle mb-2 text-muted">Приоритет: @Model.Priority</h6>
+            <p class="card-text">@Model.Description</p>
+            <p><strong>Статус:</strong> @Model.Status</p>
+            <p><strong>Срок выполнения:</strong> @Model.DueDate?.ToShortDateString()</p>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-primary mt-3">Назад к списку</a>
+</div>
