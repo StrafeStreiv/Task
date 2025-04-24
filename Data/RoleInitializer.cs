@@ -3,30 +3,37 @@ using TaskManagementSys.Models;
 
 namespace TaskManagementSys.Data
 {
-    public class RoleInitializer
+    public static class RoleInitializer
     {
         public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roleNames = { "Admin", "User" };
+            string[] roles = { "Admin", "User" };
 
-            foreach (var role in roleNames)
+            foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
+                {
                     await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
 
-            // Администратор по умолчанию
             var adminEmail = "admin@site.com";
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            var adminPassword = "Admin123!";
 
-            if (adminUser == null)
+            var admin = await userManager.FindByEmailAsync(adminEmail);
+            if (admin == null)
             {
-                var user = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-                var result = await userManager.CreateAsync(user, "Admin123!");
+                var user = new ApplicationUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
 
+                var result = await userManager.CreateAsync(user, adminPassword);
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user, "Admin");
@@ -35,4 +42,3 @@ namespace TaskManagementSys.Data
         }
     }
 }
-

@@ -22,13 +22,26 @@ namespace TaskManagementSys.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var tasks = await _context.Tasks
-                .Where(t => t.UserId == currentUserId)
-                .OrderByDescending(t => t.CreatedAt)
-                .ToListAsync();
+
+            List<TaskItem> tasks;
+
+            if (User.IsInRole("Admin"))
+            {
+                tasks = await _context.Tasks
+                    .OrderByDescending(t => t.CreatedAt)
+                    .ToListAsync();
+            }
+            else
+            {
+                tasks = await _context.Tasks
+                    .Where(t => t.UserId == currentUserId)
+                    .OrderByDescending(t => t.CreatedAt)
+                    .ToListAsync();
+            }
 
             return View(tasks);
         }
+
 
         // GET: /Tasks/Create
         public IActionResult Create()

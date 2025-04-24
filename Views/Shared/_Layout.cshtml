@@ -5,6 +5,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TaskManagementSys</title>
@@ -12,7 +15,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TaskManagementSys.styles.css" asp-append-version="true" />
-
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1828/1828817.png" />
 </head>
 <body>
@@ -36,30 +38,10 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">🔒 Политика</a>
                         </li>
+                    </ul>
 
-                        @* Вход / Регистрация / Приветствие *@
-                        @if (SignInManager.IsSignedIn(User))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">
-                                    👋 Привет, @UserManager.GetUserName(User)
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <form method="post" asp-area="Identity" asp-page="/Account/Logout" id="logoutForm" class="form-inline">
-                                    <button type="submit" class="nav-link btn btn-link">🚪 Выход</button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">🔑 Вход</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">📝 Регистрация</a>
-                            </li>
-                        }
+                    <ul class="navbar-nav">
+                        <partial name="_LoginPartial" />
                     </ul>
                 </div>
             </div>
