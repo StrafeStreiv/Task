@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TaskManagementSys.Data;
 using TaskManagementSys.Models;
-
 
 namespace TaskManagementSys.Controllers
 {
@@ -18,16 +19,16 @@ namespace TaskManagementSys.Controllers
             _context = context;
         }
 
-        // GET: /Tasks
+        // GET: Tasks
         public async Task<IActionResult> Index()
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             List<TaskItem> tasks;
 
             if (User.IsInRole("Admin"))
             {
                 tasks = await _context.Tasks
+                    .Include(t => t.User)
                     .OrderByDescending(t => t.CreatedAt)
                     .ToListAsync();
             }
@@ -35,6 +36,7 @@ namespace TaskManagementSys.Controllers
             {
                 tasks = await _context.Tasks
                     .Where(t => t.UserId == currentUserId)
+                    .Include(t => t.User)
                     .OrderByDescending(t => t.CreatedAt)
                     .ToListAsync();
             }
@@ -42,115 +44,137 @@ namespace TaskManagementSys.Controllers
             return View(tasks);
         }
 
+        // GET: Tasks/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
 
-        // GET: /Tasks/Create
+            var task = await _context.Tasks
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (task == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            return View(task);
+        }
+
+        // GET: Tasks/Create
         public IActionResult Create()
         {
+            if (User.IsInRole("Admin"))
+            {
+                ViewBag.Users = new SelectList(_context.Users, "Id", "Email");
+            }
+
             return View();
         }
 
-        // POST: /Tasks/Create
+        // POST: Tasks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TaskItem task)
         {
-            if (ModelState.IsValid)
+            if (!User.IsInRole("Admin"))
             {
                 task.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                task.CreatedAt = DateTime.Now;
+            }
 
+            if (ModelState.IsValid)
+            {
                 _context.Add(task);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(task);
-        }
-
-        // GET: /Tasks/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var task = await _context.Tasks
-                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == currentUserId);
-
-            if (task == null)
-                return NotFound();
+            if (User.IsInRole("Admin"))
+            {
+                ViewBag.Users = new SelectList(_context.Users, "Id", "Email", task.UserId);
+            }
 
             return View(task);
         }
-        // GET: /Tasks/Edit/5
+
+        // GET: Tasks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == currentUserId);
-
+            var task = await _context.Tasks.FindAsync(id);
             if (task == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            if (User.IsInRole("Admin"))
+                ViewBag.Users = new SelectList(_context.Users, "Id", "Email", task.UserId);
 
             return View(task);
         }
 
-        // POST: /Tasks/Edit/5
+        // POST: Tasks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, TaskItem task)
         {
             if (id != task.Id) return NotFound();
 
+            var existing = await _context.Tasks.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+            if (existing == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && existing.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            if (!User.IsInRole("Admin"))
+                task.UserId = existing.UserId;
+
             if (ModelState.IsValid)
             {
-                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                var taskFromDb = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == currentUserId);
-                if (taskFromDb == null) return NotFound();
-
-                // Обновляем вручную нужные поля
-                taskFromDb.Title = task.Title;
-                taskFromDb.Description = task.Description;
-                taskFromDb.Priority = task.Priority;
-                taskFromDb.Status = task.Status;
-                taskFromDb.DueDate = task.DueDate;
-
+                _context.Update(task);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
+            if (User.IsInRole("Admin"))
+                ViewBag.Users = new SelectList(_context.Users, "Id", "Email", task.UserId);
+
             return View(task);
         }
 
-        // GET: /Tasks/Delete/5
+        // GET: Tasks/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == currentUserId);
+            var task = await _context.Tasks
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (task == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
 
             return View(task);
         }
 
-        // POST: /Tasks/Delete/5
+        // POST: Tasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == currentUserId);
+            var task = await _context.Tasks.FindAsync(id);
 
-            if (task != null)
-            {
-                _context.Tasks.Remove(task);
-                await _context.SaveChangesAsync();
-            }
+            if (task == null)
+                return NotFound();
 
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            _context.Tasks.Remove(task);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

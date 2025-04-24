@@ -9,30 +9,28 @@ namespace TaskManagementSys.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Название задачи обязательно")]
-        [Display(Name = "Название задачи")]
-        public string Title { get; set; } = string.Empty;
+        [Required]
+        public string Title { get; set; }
 
-        [Display(Name = "Описание")]
         public string? Description { get; set; }
 
-        [Required]
         [Display(Name = "Статус")]
-        public TaskStatus Status { get; set; } = TaskStatus.Новая;
-
-        [Display(Name = "Дата завершения")]
-        public DateTime? DueDate { get; set; }
+        public TaskStatus Status { get; set; }
 
         [Display(Name = "Приоритет")]
-        public TaskPriority Priority { get; set; } = TaskPriority.Обычный;
+        public TaskPriority Priority { get; set; }
 
-        [Display(Name = "Пользователь")]
+        [Display(Name = "Срок")]
+        [DataType(DataType.Date)]
+        public DateTime? DueDate { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        
         public string? UserId { get; set; }
 
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
     public enum TaskStatus

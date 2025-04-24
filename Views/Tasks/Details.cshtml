@@ -13,6 +13,10 @@
             <p class="card-text">@Model.Description</p>
             <p><strong>Статус:</strong> @Model.Status</p>
             <p><strong>Срок выполнения:</strong> @Model.DueDate?.ToShortDateString()</p>
+            @if (Model.User != null)
+            {
+            <p><strong>Исполнитель:</strong> @Model.User.Email</p>
+            }
         </div>
     </div>
 
