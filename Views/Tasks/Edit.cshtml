@@ -1,0 +1,46 @@
+﻿@model TaskManagementSys.Models.TaskItem
+@{
+    ViewData["Title"] = "Редактирование задачи";
+}
+
+<div class="container mt-4">
+    <h2>Редактировать задачу</h2>
+
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select"
+                    asp-items="Html.GetEnumSelectList<TaskManagementSys.Models.TaskStatus>()">
+                <option disabled selected>Выберите статус</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Priority" class="form-label"></label>
+            <select asp-for="Priority" class="form-select"
+                    asp-items="Html.GetEnumSelectList<TaskManagementSys.Models.TaskPriority>()">
+                <option disabled selected>Выберите приоритет</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DueDate" class="form-label"></label>
+            <input asp-for="DueDate" type="date" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-success">💾 Сохранить</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">↩ Назад</a>
+    </form>
+</div>
