@@ -1,0 +1,28 @@
+﻿@model TaskManagementSys.Models.TaskItem
+
+<form id="editTaskForm">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Priority" class="form-label"></label>
+        <select asp-for="Priority" class="form-select">
+            @foreach (var priority in Enum.GetValues(typeof(TaskManagementSys.Models.TaskPriority)))
+            {
+                <option value="@priority">@priority</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="DueDate" class="form-label"></label>
+        <input asp-for="DueDate" class="form-control" type="date" />
+    </div>
+    <button type="submit" class="btn btn-success">💾 Сохранить</button>
+</form>

@@ -177,5 +177,62 @@ namespace TaskManagementSys.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Kanban(string userId, TaskPriority? priority)
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            IQueryable<TaskItem> query = _context.Tasks.Include(t => t.User);
+
+            if (!User.IsInRole("Admin"))
+                query = query.Where(t => t.UserId == currentUserId);
+
+            if (!string.IsNullOrEmpty(userId))
+                query = query.Where(t => t.UserId == userId);
+
+            if (priority.HasValue)
+                query = query.Where(t => t.Priority == priority.Value);
+
+            ViewBag.Users = new SelectList(_context.Users, "Id", "Email", userId);
+            ViewBag.SelectedPriority = priority;
+
+            var tasks = await query.ToListAsync();
+
+            var grouped = tasks
+                .GroupBy(t => t.Status)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            return View(grouped);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus([FromBody] StatusUpdateModel model)
+        {
+            if (!Enum.TryParse<Models.TaskStatus>(model.Status, out var newStatus))
+                return BadRequest();
+
+            var task = await _context.Tasks.FindAsync(model.Id);
+            if (task == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            task.Status = newStatus;
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        public async Task<IActionResult> EditModal(int id)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null) return NotFound();
+
+            if (!User.IsInRole("Admin") && task.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Forbid();
+
+            return PartialView("_EditModal", task);
+        }
+
+
+
     }
 }
