@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.Metrics;
 using TaskManagementSys.Models;
 
 namespace TaskManagementSys.Models
@@ -31,6 +32,12 @@ namespace TaskManagementSys.Models
 
         [ForeignKey("UserId")]
         public ApplicationUser? User { get; set; }
+        public int? TeamId { get; set; }
+
+        [ForeignKey("TeamId")]
+        public Team? Team { get; set; }
+
+
     }
 
     public enum TaskStatus

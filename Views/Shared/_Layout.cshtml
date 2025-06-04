@@ -45,6 +45,13 @@
 
                     <ul class="navbar-nav">
                         <partial name="_LoginPartial" />
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Admin">Админ-панель</a>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>

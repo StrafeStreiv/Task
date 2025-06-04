@@ -1,0 +1,43 @@
+﻿@model IEnumerable<TaskManagementSys.Models.AdminUserViewModel>
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Панель администратора";
+}
+
+<h2 class="mt-4">Список пользователей</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Email</th>
+            <th>Роль</th>
+            <th>Команда</th>
+            <th>Изменить команду</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>@user.Roles</td>
+                <td>@user.TeamName</td>
+                <td>
+                    <form asp-action="ChangeTeam" asp-controller="Admin" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@user.Id" />
+                        <select name="teamId" class="form-select">
+                            @foreach (var team in (SelectList)ViewBag.Teams)
+                            {
+                                <option value="@team.Value" selected="@(team.Value == user.TeamId?.ToString())">
+                                    @team.Text
+                                </option>
+                            }
+                        </select>
+                        <button class="btn btn-sm btn-primary">Сохранить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
