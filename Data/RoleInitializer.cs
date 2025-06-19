@@ -13,7 +13,7 @@ namespace TaskManagementSys.Data
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            // ✅ 1. Добавляем роли
+            //  1. Добавляем роли
             string[] roles = { "Admin", "User" };
             foreach (var role in roles)
             {
@@ -21,7 +21,7 @@ namespace TaskManagementSys.Data
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // ✅ 2. Создаем команды, если их нет
+            // 2. Создаем команды
             string[] teamNames = { "Default", "Back", "Front", "Design" };
             foreach (var name in teamNames)
             {
@@ -31,7 +31,7 @@ namespace TaskManagementSys.Data
 
             await context.SaveChangesAsync();
 
-            // ✅ 3. Привязываем пользователей и задачи к Default, если TeamId == null
+            //  3. Привязываем пользователей и задачи к Default, если TeamId == null
             var defaultTeam = await context.Teams.FirstOrDefaultAsync(t => t.Name == "Default");
             if (defaultTeam != null)
             {
@@ -50,7 +50,7 @@ namespace TaskManagementSys.Data
                 await context.SaveChangesAsync();
             }
 
-            // ✅ 4. Создаем администратора
+            //  4. Создаем администратора
             var adminEmail = "admin@site.com";
             var adminPassword = "Admin123!";
 

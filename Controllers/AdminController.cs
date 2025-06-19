@@ -50,12 +50,25 @@ namespace TaskManagementSys.Controllers
         public async Task<IActionResult> ChangeTeam(string id, int teamId)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null) return NotFound();
+
+            if (user == null)
+                return NotFound();
 
             user.TeamId = teamId;
-            await _userManager.UpdateAsync(user);
+
+            
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

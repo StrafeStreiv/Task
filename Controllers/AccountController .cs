@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSys.Data;
@@ -80,6 +81,52 @@ namespace TaskManagementSys.Controllers
 
             return View(model);
         }
+        [Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Team)
+                .FirstOrDefaultAsync(u => u.Id == _userManager.GetUserId(User));
+
+            var teamUsers = await _context.Users
+                .Where(u => u.TeamId == user.TeamId && u.Id != user.Id)
+                .Select(u => u.Email)
+                .ToListAsync();
+
+            var model = new ProfileViewModel
+            {
+                Email = user.Email,
+                FullName = user.FullName,
+                Theme = user.Theme,
+                TeamName = user.Team?.Name ?? "Без команды",
+                TeamMembers = teamUsers
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                user.FullName = model.FullName;
+                user.Theme = model.Theme;
+                await _userManager.UpdateAsync(user);
+
+                ViewBag.StatusMessage = "✅ Профиль обновлён";
+                model.Email = user.Email;
+                model.TeamName = (await _context.Teams.FindAsync(user.TeamId))?.Name ?? "Без команды";
+            }
+
+            return View(model);
+        }
+
+
 
         // === LOGOUT ===
         [HttpPost]

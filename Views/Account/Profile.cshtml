@@ -1,0 +1,61 @@
+﻿@model TaskManagementSys.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Профиль пользователя";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">👤 Профиль</h2>
+
+    @if (ViewBag.StatusMessage != null)
+    {
+        <div class="alert alert-success">@ViewBag.StatusMessage</div>
+    }
+
+    <form asp-action="Profile" method="post" class="border p-4 shadow-sm rounded bg-light">
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" class="form-control" disabled />
+        </div>
+        @if (Model.TeamName != null)
+        {
+            <hr />
+            <h5>👥 Ваша команда: @Model.TeamName</h5>
+
+            @if (Model.TeamMembers?.Any() == true)
+            {
+                <ul class="list-group mb-3">
+                    @foreach (var member in Model.TeamMembers)
+                    {
+                        <li class="list-group-item">@member</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted">Вы единственный участник этой команды.</p>
+            }
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Тема оформления</label>
+            <select asp-for="Theme" class="form-select">
+                <option value="light">Светлая</option>
+                <option value="dark">Тёмная</option>
+            </select>
+            </div>
+
+
+        <div class="mb-3">
+            <label asp-for="TeamName" class="form-label">Команда</label>
+            <input asp-for="TeamName" class="form-control" disabled />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label">ФИО</label>
+            <input asp-for="FullName" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+    </form>
+</div>

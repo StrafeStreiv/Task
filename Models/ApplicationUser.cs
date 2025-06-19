@@ -11,5 +11,7 @@ namespace TaskManagementSys.Models
 
         [ForeignKey("TeamId")]
         public Team? Team { get; set; }
+        public string? Theme { get; set; } = "light"; // light или dark
+
     }
 }

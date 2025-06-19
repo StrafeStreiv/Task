@@ -20,3 +20,32 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+    body.light {
+        background-color: #ffffff;
+        color: #000000;
+    }
+
+    body.dark {
+        background-color: #1e1e1e;
+        color: #f0f0f0;
+    }
+
+        body.dark a,
+        body.dark .nav-link {
+            color: #90cdf4;
+        }
+
+        body.dark .card,
+        body.dark .navbar,
+        body.dark .table {
+            background-color: #2e2e2e;
+            color: #fff;
+        }
+
+        body.dark .btn {
+            background-color: #444;
+            border-color: #555;
+            color: #eee;
+        }
+
